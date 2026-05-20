@@ -1,1 +1,1 @@
-// multiple class home pages for different classes? 
+// default class file for various classes. create multiple class home pages for different classes--currently have math and english.
