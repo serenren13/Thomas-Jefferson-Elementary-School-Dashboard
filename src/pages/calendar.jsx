@@ -6,6 +6,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -26,12 +27,19 @@ import {
   Typography,
 } from "@mui/material";
 
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+
 function Calendar() {
   const [events, setEvents] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [editingEventId, setEditingEventId] = useState(null);
 
   const [form, setForm] = useState({
     title: "",
-    date: "",
+    date: dayjs().format("YYYY-MM-DD"),
     location: "",
     description: "",
   });
@@ -51,6 +59,25 @@ function Calendar() {
     return () => unsubscribe();
   }, []);
 
+  const selectedDateString = selectedDate.format("YYYY-MM-DD");
+
+  const eventsForSelectedDate = events.filter(
+    (event) => event.date === selectedDateString
+  );
+
+  function handleDateChange(newDate) {
+    setSelectedDate(newDate);
+
+    setForm({
+      title: "",
+      date: newDate.format("YYYY-MM-DD"),
+      location: "",
+      description: "",
+    });
+
+    setEditingEventId(null);
+  }
+
   function handleChange(event) {
     setForm({
       ...form,
@@ -58,7 +85,7 @@ function Calendar() {
     });
   }
 
-  async function handleAddEvent(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (!form.title || !form.date) {
@@ -66,11 +93,16 @@ function Calendar() {
       return;
     }
 
-    await addDoc(eventsCollection, form);
+    if (editingEventId) {
+      await updateDoc(doc(db, "events", editingEventId), form);
+      setEditingEventId(null);
+    } else {
+      await addDoc(eventsCollection, form);
+    }
 
     setForm({
       title: "",
-      date: "",
+      date: selectedDateString,
       location: "",
       description: "",
     });
@@ -80,8 +112,17 @@ function Calendar() {
     await deleteDoc(doc(db, "events", id));
   }
 
-  async function handleEditEvent(id) {
-    
+  function handleEditEvent(schoolEvent) {
+    setEditingEventId(schoolEvent.id);
+
+    setForm({
+      title: schoolEvent.title,
+      date: schoolEvent.date,
+      location: schoolEvent.location,
+      description: schoolEvent.description,
+    });
+
+    setSelectedDate(dayjs(schoolEvent.date));
   }
 
   return (
@@ -90,70 +131,91 @@ function Calendar() {
         School Calendar
       </Typography>
 
-      <Card sx={{ mb: 4 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={20} md={20}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Select Date
+              </Typography>
+
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                />
+              </LocalizationProvider>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={20} md={20}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                {editingEventId ? "Edit Event" : "Add Event"}
+              </Typography>
+
+              <Box component="form" onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Event Title"
+                      name="title"
+                      value={form.title}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      type="date"
+                      label="Date"
+                      name="date"
+                      value={form.date}
+                      onChange={handleChange}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Location"
+                      name="location"
+                      value={form.location}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Description"
+                      name="description"
+                      value={form.description}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Button type="submit" variant="contained">
+                      {editingEventId ? "Update Event" : "Add Event"}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Card sx={{ mt: 4 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Add Event
-          </Typography>
-
-          <Box component="form" onSubmit={handleAddEvent}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  label="Event Title"
-                  name="title"
-                  value={form.title}
-                  onChange={handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Date"
-                  name="date"
-                  value={form.date}
-                  onChange={handleChange}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  label="Location"
-                  name="location"
-                  value={form.location}
-                  onChange={handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  label="Description"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained">
-                  Add Event
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Events Database
+            Events on {selectedDateString}
           </Typography>
 
           <Table>
@@ -168,7 +230,7 @@ function Calendar() {
             </TableHead>
 
             <TableBody>
-              {events.map((schoolEvent) => (
+              {eventsForSelectedDate.map((schoolEvent) => (
                 <TableRow key={schoolEvent.id}>
                   <TableCell>{schoolEvent.title}</TableCell>
                   <TableCell>{schoolEvent.date}</TableCell>
@@ -176,26 +238,28 @@ function Calendar() {
                   <TableCell>{schoolEvent.description}</TableCell>
                   <TableCell>
                     <Button
+                      color="primary"
+                      variant="outlined"
+                      onClick={() => handleEditEvent(schoolEvent)}
+                      sx={{ mr: 1 }}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
                       color="error"
                       variant="outlined"
                       onClick={() => handleDeleteEvent(schoolEvent.id)}
                     >
                       Delete
                     </Button>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      onClick={() => handleEditEvent(schoolEvent.id)}
-                    >
-                      Edit
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
 
-              {events.length === 0 && (
+              {eventsForSelectedDate.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5}>No events found.</TableCell>
+                  <TableCell colSpan={5}>No events for this date.</TableCell>
                 </TableRow>
               )}
             </TableBody>
