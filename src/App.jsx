@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Students from "./pages/students"
 
 function Home() {
   return <h1>Home Page</h1>;
@@ -15,10 +16,6 @@ function ClassHome() {
 
 function TeacherDashboard() {
   return <h1>Teacher Dashboard</h1>;
-}
-
-function Students() {
-  return <h1>Student Directory</h1>;
 }
 
 function Teachers() {
