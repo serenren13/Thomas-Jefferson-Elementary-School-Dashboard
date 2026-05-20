@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/NavBar";
 
-import Home from "./pages/main";
+import Home from "./pages/home";
 import ClassesDashboard from "./pages/classes-dashboard";
 import ClassHome from "./pages/class-home";
 import TeacherDashboard from "./pages/teacher-dashboard";
