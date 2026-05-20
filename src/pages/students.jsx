@@ -16,6 +16,16 @@ export default function Students() {
         })
     }, []) 
 
-    return <h1>Students</h1>
+    return (
+        <div>
+            {students.map((student) => (
+                <div key={student.id}>
+                    <p>{student.firstName}</p>
+                    <p>{student.lastName}</p>
+                    <p>{student.gradeLevel}</p>
 
+                </div>
+            ))}
+        </div>
+    )
 }
