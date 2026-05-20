@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Calendar from "./pages/calendar";
 
 function Home() {
   return <h1>Home Page</h1>;
@@ -23,10 +24,6 @@ function Students() {
 
 function Teachers() {
   return <h1>Teacher Directory</h1>;
-}
-
-function Calendar() {
-  return <h1>Calendar</h1>;
 }
 
 function App() {
