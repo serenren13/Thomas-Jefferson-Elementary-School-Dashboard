@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { collection, getDocs } from "firebase/firestore"
-import { db } from "../firebase"
+import { db } from "../firebase/firebase"
 import AddStudentForm from "../components/AddStudentForm"
 
 export default function Students() {
