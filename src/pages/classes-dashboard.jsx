@@ -99,9 +99,11 @@ export default function ClassesDashboard() {
 
     if (editingClassId) {
       const existing = classes.find((c) => c.id === editingClassId);
-      classData.studentIds = Array.isArray(existing?.studentIds)
-        ? existing.studentIds
-        : [];
+      // keep roster on edit
+      let ids = existing?.studentIds || [];
+      if (typeof ids === "string") ids = ids ? [ids] : [];
+      if (!Array.isArray(ids)) ids = [];
+      classData.studentIds = ids;
       await updateDoc(doc(db, "classes", editingClassId), classData);
       setEditingClassId(null);
     } else {
