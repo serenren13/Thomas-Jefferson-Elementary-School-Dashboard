@@ -7,9 +7,6 @@ function ClassesDashboard() {
       <Typography variant="h3" fontWeight="bold">
         Classes Dashboard
       </Typography>
-      <Typography color="text.secondary" sx={{ mt: 1 }}>
-        Coming soon.
-      </Typography>
     </Box>
   );
 }

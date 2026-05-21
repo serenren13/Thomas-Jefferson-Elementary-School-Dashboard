@@ -43,13 +43,8 @@ const features = [
 export default function Home() {
   return (
     <Box sx={{ p: 3, width: "100%" }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
+      <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
         Thomas Jefferson Elementary School
-      </Typography>
-
-      <Typography color="text.secondary" sx={{ mb: 3 }}>
-        Administrative dashboard. Choose a section below or use the
-        navigation bar at the top.
       </Typography>
 
       <Box
