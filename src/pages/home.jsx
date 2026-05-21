@@ -28,16 +28,6 @@ const features = [
     description: "Add and update grades for students in your classes.",
     path: "/teacher-dashboard",
   },
-  {
-    title: "Math Class",
-    description: "Class roster, grades, and details for math.",
-    path: "/math-home",
-  },
-  {
-    title: "English Class",
-    description: "Class roster, grades, and details for english.",
-    path: "/english-home",
-  },
 ];
 
 export default function Home() {
