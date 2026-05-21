@@ -1,32 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Home from "./pages/home";
+import Students from "./pages/students";
+import Calendar from "./pages/calendar";
+import ClassesDashboard from "./pages/classes-dashboard";
+import ClassHome from "./pages/class-home";
+import Teachers from "./pages/teachers";
 
-function Home() {
-  return <h1>Home Page</h1>;
-}
-
-function ClassesDashboard() {
-  return <h1>Classes Dashboard</h1>;
-}
-
-function ClassHome() {
-  return <h1>Class Home</h1>;
-}
+// after finishing each page, import it here with the same name as the function. 
 
 function TeacherDashboard() {
   return <h1>Teacher Dashboard</h1>;
-}
-
-function Students() {
-  return <h1>Student Directory</h1>;
-}
-
-function Teachers() {
-  return <h1>Teacher Directory</h1>;
-}
-
-function Calendar() {
-  return <h1>Calendar</h1>;
 }
 
 function App() {
@@ -38,7 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/classes-dashboard" element={<ClassesDashboard />} />
-          <Route path="/class-home" element={<ClassHome />} />
+          <Route path="/class/:classId" element={<ClassHome />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/students" element={<Students />} />
           <Route path="/teachers" element={<Teachers />} />
