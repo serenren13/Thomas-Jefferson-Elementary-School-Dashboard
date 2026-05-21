@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { addDoc, collection } from "firebase/firestore"
 import { db } from "../firebase/firebase"
+import { Box, Button, TextField, Typography } from "@mui/material"
 
 export default function AddTeacherForm() {
     const [firstName, setFirstName] = useState("")
@@ -16,7 +17,7 @@ export default function AddTeacherForm() {
             lastName,
             email,
             subject,
-            classIds
+            classIds: classIds.split(",").map(id => id.trim())
         })
         setFirstName("")
         setLastName("")
@@ -26,45 +27,22 @@ export default function AddTeacherForm() {
     }
 
     return (
-    <div>
-        <form onSubmit={handleSubmit}>
-            <label htmlFor="firstName">firstName:</label>
-            <input
-                type="text"
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-            />
-            <label htmlFor="lastName">lastName:</label>
-            <input
-                type="text"
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-            />
-            <label htmlFor="email">email:</label>
-            <input
-                type="text"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <label htmlFor="subject">subject:</label>
-            <input
-                type="text"
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-            />
-            <label htmlFor="classIds">classIds:</label>
-            <input
-                type="text"
-                id="classIds"
-                value={classIds}
-                onChange={(e) => setClassIds(e.target.value.split(","))}
-            />
-            <button type="submit">Add Teacher</button>
-        </form>
-    </div>
-)
+        <Box sx={{ mt: 4, p: 3, border: "1px solid #e0e0e0", borderRadius: 2 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Add New Teacher
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField label="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} fullWidth />
+                    <TextField label="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} fullWidth />
+                </Box>
+                <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
+                <TextField label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} fullWidth />
+                <TextField label="Class IDs (comma separated)" value={classIds} onChange={(e) => setClassIds(e.target.value)} fullWidth />
+                <Button type="submit" variant="contained" sx={{ alignSelf: "flex-start" }}>
+                    Add Teacher
+                </Button>
+            </Box>
+        </Box>
+    )
 }
