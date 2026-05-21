@@ -1,23 +1,17 @@
-import { useEffect, useState } from "react";
-import {
-  addDoc,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-} from "firebase/firestore";
+import { Box, Typography } from "@mui/material";
 
-import { db } from "../firebase";
-import { eventsCollection } from "../services/firestore";
+// placeholder until class dashboard is built out
+function ClassesDashboard() {
+  return (
+    <Box sx={{ p: 4 }}>
+      <Typography variant="h3" fontWeight="bold">
+        Classes Dashboard
+      </Typography>
+      <Typography color="text.secondary" sx={{ mt: 1 }}>
+        Coming soon.
+      </Typography>
+    </Box>
+  );
+}
 
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  Typography,
-} from "@mui/material";
-
+export default ClassesDashboard;
