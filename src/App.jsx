@@ -8,11 +8,7 @@ import ClassHome from "./pages/class-home";
 import Teachers from "./pages/teachers";
 //import { seedDatabase } from "./services/seedData"; // temp to populate database
 
-// after finishing each page, import it here with the same name as the function. 
-
-function TeacherDashboard() {
-  return <h1>Teacher Dashboard</h1>;
-}
+// after finishing each page, import it here with the same name as the function.
 
 function App() {
   return (
@@ -24,7 +20,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/classes-dashboard" element={<ClassesDashboard />} />
           <Route path="/class/:classId" element={<ClassHome />} />
-          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/students" element={<Students />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/calendar" element={<Calendar />} />
