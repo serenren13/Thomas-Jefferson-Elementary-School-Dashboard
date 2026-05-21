@@ -1,14 +1,15 @@
 import { useState } from "react"
 import { addDoc, collection } from "firebase/firestore"
 import { db } from "../firebase/firebase"
+import { Box, Button, TextField, Typography } from "@mui/material"
 
 export default function AddStudentForm() {
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
     const [birthday, setBirthday] = useState("")
     const [gradeLevel, setGradeLevel] = useState("")
-    const [classId, setClassId] = useState("")
-    const [parentContact, setParentContact] = useState("")
+    const [classIds, setClassIds] = useState("")
+    const [parentEmailContact, setParentEmailContact] = useState("")
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -17,64 +18,37 @@ export default function AddStudentForm() {
             lastName,
             birthday,
             gradeLevel,
-            classId,
-            parentContact
+            classIds: classIds.split(",").map(id => id.trim()),
+            parentEmailContact
         })
         setFirstName("")
         setLastName("")
         setBirthday("")
         setGradeLevel("")
-        setClassId("")
-        setParentContact("")
+        setClassIds("")
+        setParentEmailContact("")
     }
 
-    return(
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="firstName">firstName:</label>
-                <input
-                    type="text"
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                />
-                <label htmlFor="lastName">lastName:</label>
-                <input 
-                    type="text"
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                />
-                <label htmlFor="birthday">birthday:</label>
-                <input 
-                    type="date"
-                    id="birthday"
-                    value={birthday}
-                    onChange={(e) => setBirthday(e.target.value)}
-                />
-                <label htmlFor="gradeLevel">gradeLevel:</label>
-                <input 
-                    type="number"
-                    id="gradeLevel"
-                    value={gradeLevel}
-                    onChange={(e) => setGradeLevel(e.target.value)}
-                />
-                <label htmlFor="classId">classId:</label>
-                <input 
-                    type="text"
-                    id="classId"
-                    value={classId}
-                    onChange={(e) => setClassId(e.target.value)}
-                />
-                <label htmlFor="parentContact">parentContact:</label>
-                <input 
-                    type="text"
-                    id="parentContact"
-                    value={parentContact}
-                    onChange={(e) => setParentContact(e.target.value)}
-                />
-                <button type="submit">Add Student</button>
-            </form>
-        </div>
+    return (
+        <Box sx={{ mt: 4, p: 3, border: "1px solid #e0e0e0", borderRadius: 2 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Add New Student
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField label="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} fullWidth />
+                    <TextField label="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} fullWidth />
+                </Box>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField label="Birthday" type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} fullWidth InputLabelProps={{ shrink: true }} />
+                    <TextField label="Grade Level" type="number" value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} fullWidth />
+                </Box>
+                <TextField label="Class IDs (comma separated)" value={classIds} onChange={(e) => setClassIds(e.target.value)} fullWidth />
+                <TextField label="Parent Email" value={parentEmailContact} onChange={(e) => setParentEmailContact(e.target.value)} fullWidth />
+                <Button type="submit" variant="contained" sx={{ alignSelf: "flex-start" }}>
+                    Add Student
+                </Button>
+            </Box>
+        </Box>
     )
 }
