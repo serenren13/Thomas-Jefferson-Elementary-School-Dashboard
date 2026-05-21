@@ -29,7 +29,13 @@ export default function ClassHome() {
         }
       }
 
-      const studentIds = data.studentIds || [];
+      let studentIds = data.studentIds || [];
+      if (typeof studentIds === "string") {
+        studentIds = studentIds ? [studentIds] : [];
+      }
+      if (!Array.isArray(studentIds)) {
+        studentIds = [];
+      }
       if (studentIds.length === 0) {
         setRoster([]);
         return;
