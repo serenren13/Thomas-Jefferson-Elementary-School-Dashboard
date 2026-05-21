@@ -25,7 +25,7 @@ export default function Teachers() {
                 <div key={teacher.id}>
                     <p>{teacher.firstName}</p>
                     <p>{teacher.lastName}</p>
-                    <p>{teacher.gradeLevel}</p>
+                    <p>{teacher.subject}</p>
                     <p>{teacher.classIds}</p>
                     <p>{teacher.email}</p>
                 </div>

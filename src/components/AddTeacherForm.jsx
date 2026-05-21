@@ -6,7 +6,7 @@ export default function AddTeacherForm() {
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
-    const [gradeLevel, setGradeLevel] = useState("")
+    const [subject, setSubject] = useState("")
     const [classIds, setClassIds] = useState("")
 
     const handleSubmit = async (e) => {
@@ -15,13 +15,13 @@ export default function AddTeacherForm() {
             firstName,
             lastName,
             email,
-            gradeLevel,
+            subject,
             classIds
         })
         setFirstName("")
         setLastName("")
         setEmail("")
-        setGradeLevel("")
+        setSubject("")
         setClassIds("")
     }
 
@@ -49,12 +49,12 @@ export default function AddTeacherForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
-            <label htmlFor="gradeLevel">gradeLevel:</label>
+            <label htmlFor="subject">subject:</label>
             <input
-                type="number"
-                id="gradeLevel"
-                value={gradeLevel}
-                onChange={(e) => setGradeLevel(e.target.value)}
+                type="text"
+                id="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
             />
             <label htmlFor="classIds">classIds:</label>
             <input
