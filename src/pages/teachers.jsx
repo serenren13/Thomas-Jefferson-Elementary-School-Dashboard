@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
-import { collection, onSnapshot } from "firebase/firestore"
+import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore"
 import { db } from "../firebase/firebase"
 import AddTeacherForm from "../components/AddTeacherForm"
-import { Box, Card, CardContent, Typography, Chip } from "@mui/material"
+import { Box, Button, Card, CardContent, Typography, Chip } from "@mui/material"
 
 export default function Teachers() {
     const [teachers, setTeachers] = useState([])
@@ -26,6 +26,11 @@ export default function Teachers() {
     const filteredTeachers = selectedSubject === "all"
         ? teachers
         : teachers.filter(t => t.subject === selectedSubject)
+
+    // removeTeacher function
+    const removeTeacher = async (teacherId) => {
+        await deleteDoc(doc(db, "teachers", teacherId))
+    }
 
     return (
         <Box sx={{ p: 3 }}>
@@ -64,6 +69,9 @@ export default function Teachers() {
                             <Typography color="text.secondary">
                                 {teacher.email ?? "—"}
                             </Typography>
+                            <Button onClick={() => removeTeacher(teacher.id)} color="error" variant="outlined">
+                                Delete
+                            </Button>
                         </CardContent>
                     </Card>
                 ))}

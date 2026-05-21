@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
-import { collection, onSnapshot } from "firebase/firestore"
+import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore"
 import { db } from "../firebase/firebase"
 import AddStudentForm from "../components/AddStudentForm"
-import { Box, Card, CardContent, Typography, Chip } from "@mui/material"
+import { Box, Button, Card, CardContent, Typography, Chip } from "@mui/material"
 
 export default function Students() {
     const [students, setStudents] = useState([])    //stores data; variable that causes the UI to re-render when it changes
@@ -39,6 +39,11 @@ export default function Students() {
         : students.filter((student) =>
             student.classIds?.includes(selectedClass)
     )
+
+    // removeStudent function
+    const removeStudent = async (studentId) => {
+        await deleteDoc(doc(db, "students", studentId))
+    }
 
 
     return (
@@ -88,6 +93,9 @@ export default function Students() {
                         <Typography color="text.secondary">
                             {student.parentEmailContact ?? "-"}
                         </Typography>
+                        <Button onClick={() => removeStudent(student.id)} color="error" variant="outlined">
+                            Delete
+                        </Button>
                     </CardContent>
                 </Card>
             ))}
