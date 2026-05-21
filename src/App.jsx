@@ -6,6 +6,7 @@ import Calendar from "./pages/calendar";
 import ClassesDashboard from "./pages/classes-dashboard";
 import ClassHome from "./pages/class-home";
 import Teachers from "./pages/teachers";
+//import { seedDatabase } from "./services/seedData"; // temp to populate database
 
 // after finishing each page, import it here with the same name as the function. 
 
@@ -15,9 +16,9 @@ function TeacherDashboard() {
 
 function App() {
   return (
+    
     <Router>
       <Navbar />
-
       <div style={{ padding: "24px" }}>
         <Routes>
           <Route path="/" element={<Home />} />
