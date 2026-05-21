@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../firebase/firebase";
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 
 export default function ClassHome() {
