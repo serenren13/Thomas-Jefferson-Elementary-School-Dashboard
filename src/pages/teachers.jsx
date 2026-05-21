@@ -1,36 +1,35 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { useState, useEffect } from "react"
+import { collection, onSnapshot } from "firebase/firestore"
+import { db } from "../firebase/firebase"
+import AddTeacherForm from "../components/AddTeacherForm"
 
 export default function Teachers() {
-  const [teachers, setTeachers] = useState([]);
+    const [teachers, setTeachers] = useState([])
 
-  useEffect(() => {
-    getDocs(collection(db, "teachers")).then((snapshot) => {
-      const teacherList = snapshot.docs.map((document) => ({
-        id: document.id,
-        ...document.data(),
-      }));
-      setTeachers(teacherList);
-    });
-  }, []);
+        useEffect(() => {
+            const unsubscribe = onSnapshot(collection(db, "teachers"), (snapshot) => {
+             const teacherList = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            setTeachers(teacherList)
+        })
 
-  return (
-    <div>
-      <h1>Teacher Directory</h1>
+    return unsubscribe
+}, [])
 
-      {teachers.length === 0 ? (
-        <p>No teachers in Firebase yet.</p>
-      ) : (
-        teachers.map((teacher) => (
-          <div key={teacher.id}>
-            <p>
-              {teacher.firstName} {teacher.lastName}
-            </p>
-            <p>{teacher.email}</p>
-          </div>
-        ))
-      )}
-    </div>
-  );
+    return (
+        <div>
+            <AddTeacherForm />
+            {teachers.map((teacher) => (
+                <div key={teacher.id}>
+                    <p>{teacher.firstName}</p>
+                    <p>{teacher.lastName}</p>
+                    <p>{teacher.subject}</p>
+                    <p>{teacher.classIds}</p>
+                    <p>{teacher.email}</p>
+                </div>
+            ))}
+        </div>
+    )
 }

@@ -4,7 +4,7 @@ import {
     getDocs,
     serverTimestamp,
   } from "firebase/firestore";
-  import { db } from "../firebase";
+  import { db } from "../firebase/firebase";
 
     export const studentsCollection = collection(db, "students");
     export const teachersCollection = collection(db, "teachers");
