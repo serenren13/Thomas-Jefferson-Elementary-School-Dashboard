@@ -9,7 +9,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-import { db } from "../firebase";
+import { db } from "../firebase/firebase";
 import { eventsCollection } from "../services/firestore";
 
 import {
@@ -21,3 +21,8 @@ import {
   Typography,
 } from "@mui/material";
 
+function ClassesDashboard() {
+  return <h1>Classes Dashboard</h1>;
+}
+
+export default ClassesDashboard;
