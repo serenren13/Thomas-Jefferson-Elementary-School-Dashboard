@@ -5,7 +5,16 @@ function Navbar() {
   return (
     <AppBar position="static" elevation={0} sx={{ backgroundColor: "#1f2937" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h6" fontWeight="bold">
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          component={Link}
+          to="/"
+          sx={{
+            color: "inherit",
+            textDecoration: "none",
+          }}
+        >
           Thomas Jefferson School Dashboard
         </Typography>
 
