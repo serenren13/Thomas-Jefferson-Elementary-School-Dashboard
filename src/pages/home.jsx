@@ -23,11 +23,6 @@ const features = [
     description: "See and manage upcoming school events.",
     path: "/calendar",
   },
-  {
-    title: "Teacher Dashboard",
-    description: "Add and update grades for students in your classes.",
-    path: "/teacher-dashboard",
-  },
 ];
 
 export default function Home() {
