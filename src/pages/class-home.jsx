@@ -193,19 +193,22 @@ export default function ClassHome() {
 }
 
   async function handleAddExistingStudent() {
-    if (!selectedStudentId) return;
+  if (!selectedStudentId) return;
 
-    await updateDoc(doc(db, "classes", classId), {
-      studentIds: arrayUnion(selectedStudentId),
-    });
+  const classRef = doc(db, "classes", classId);
+  const studentRef = doc(db, "students", selectedStudentId);
 
-    await updateDoc(doc(db, "students", selectedStudentId), {
-      classIds: arrayUnion(classId),
-    });
+  await updateDoc(classRef, {
+    studentIds: arrayUnion(selectedStudentId),
+  });
 
-    setSelectedStudentId("");
-    await loadClassPage();
-  }
+  await updateDoc(studentRef, {
+    classIds: arrayUnion(classId),
+  });
+
+  setSelectedStudentId("");
+  await loadClassPage();
+}
 
   async function handleCreateStudent() {
     if (!newStudent.firstName || !newStudent.lastName) return;
