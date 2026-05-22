@@ -7,6 +7,8 @@ import { Box, Button, Card, CardContent, Typography, Chip } from "@mui/material"
 export default function Teachers() {
     const [teachers, setTeachers] = useState([])
     const [selectedSubject, setSelectedSubject] = useState("all")
+    const [editingId, setEditingId] = useState(null)
+    const [editForm, setEditForm] = useState({})
 
     useEffect(() => {
         const unsubscribe = onSnapshot(collection(db, "teachers"), (snapshot) => {
@@ -19,10 +21,8 @@ export default function Teachers() {
         return unsubscribe
     }, [])
 
-    // get unique subjects for filter tabs
     const subjects = ["all", ...new Set(teachers.map(t => t.subject).filter(Boolean))]
 
-    // filter teachers based on selected subject
     const filteredTeachers = selectedSubject === "all"
         ? teachers
         : teachers.filter(t => t.subject === selectedSubject)
@@ -38,7 +38,6 @@ export default function Teachers() {
                 Teacher Directory
             </Typography>
 
-            {/* Filter tabs */}
             <Box sx={{ display: "flex", gap: 1, mb: 3, flexWrap: "wrap" }}>
                 {subjects.map((subject) => (
                     <Chip
@@ -51,7 +50,6 @@ export default function Teachers() {
                 ))}
             </Box>
 
-            {/* Teacher cards grid */}
             <Box sx={{
                 display: "grid",
                 gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "1fr 1fr 1fr" },
