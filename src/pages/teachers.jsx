@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore"
-import { db } from "../firebase/firebase"
+import { subscribeToTeachers, deleteTeacher, updateTeacher } from "../services/firestore"
 import AddTeacherForm from "../components/AddTeacherForm"
 import { Box, Button, Card, CardContent, TextField, Typography, Chip } from "@mui/material"
 
@@ -11,13 +10,7 @@ export default function Teachers() {
     const [editForm, setEditForm] = useState({})
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "teachers"), (snapshot) => {
-            const teacherList = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setTeachers(teacherList)
-        })
+        const unsubscribe = subscribeToTeachers(setTeachers)
         return unsubscribe
     }, [])
 
@@ -28,7 +21,7 @@ export default function Teachers() {
         : teachers.filter(t => t.subject === selectedSubject)
 
     const removeTeacher = async (teacherId) => {
-        await deleteDoc(doc(db, "teachers", teacherId))
+        await deleteTeacher(teacherId)
     }
 
     const handleEdit = (teacher) => {
@@ -42,7 +35,7 @@ export default function Teachers() {
     }
 
     const handleSave = async (teacherId) => {
-        await updateDoc(doc(db, "teachers", teacherId), editForm)
+        await updateTeacher(teacherId, editForm)
         setEditingId(null)
     }
 

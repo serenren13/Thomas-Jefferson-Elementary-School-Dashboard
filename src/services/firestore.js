@@ -143,7 +143,7 @@ export function subscribeToClasses(onDataChange) {
 
 export async function deleteStudent(studentId) {
   const studentRef = doc(db, "students", studentId);
-  
+
   return await deleteDoc(studentRef);
 }
 
@@ -152,5 +152,30 @@ export async function updateStudent(studentId, updatedStudent) {
 
   return await updateDoc(studentRef, {
     ...updatedStudent,
+  });
+}
+
+export function subscribeToTeachers(onDataChange) {
+  const unsubscribe = onSnapshot(collection(db, "teachers"), (snapshot) => {
+    const teacherList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+    onDataChange(teacherList)
+  })
+  return unsubscribe
+}
+
+export async function deleteTeacher(teacherId) {
+  const teacherRef = doc(db, "teachers", teacherId);
+
+  return await deleteDoc(teacherRef);
+}
+
+export async function updateTeacher(teacherId, updatedTeacher) {
+  const teacherRef = doc(db, "teachers", teacherId);
+
+  return await updateDoc(teacherRef, {
+    ...updatedTeacher,
   });
 }
