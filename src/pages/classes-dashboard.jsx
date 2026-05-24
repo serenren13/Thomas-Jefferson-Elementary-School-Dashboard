@@ -1,18 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  addDoc,
-  arrayRemove,
-  arrayUnion,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  onSnapshot,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "../firebase/firebase";
-import { classesCollection } from "../services/firestore";
+import { classesCollection, deleteClass, addClass, updateClass, subscribeToClasses, subscribeToTeachers } from "../services/firestore";
 import {
   Box,
   Button,
@@ -38,27 +26,15 @@ export default function ClassesDashboard() {
 
   // live list of classes
   useEffect(() => {
-    const unsubscribe = onSnapshot(classesCollection, (snapshot) => {
-      const classList = snapshot.docs.map((document) => ({
-        id: document.id,
-        ...document.data(),
-      }));
-      setClasses(classList);
-    });
-
-    return () => unsubscribe();
-  }, []);
+    const unsubscribe = subscribeToClasses(setClasses)
+    return unsubscribe
+  }, [])
 
   // teachers for dropdown
   useEffect(() => {
-    getDocs(collection(db, "teachers")).then((snapshot) => {
-      const teacherList = snapshot.docs.map((document) => ({
-        id: document.id,
-        ...document.data(),
-      }));
-      setTeachers(teacherList);
-    });
-  }, []);
+    const unsubscribe = subscribeToTeachers(setTeachers)
+    return unsubscribe
+  }, [])
 
   function handleChange(event) {
     setForm({
@@ -83,88 +59,46 @@ export default function ClassesDashboard() {
   }
 
   async function handleSubmit(event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (!form.name.trim()) {
-    alert("Please enter a class name.");
-    return;
-  }
-
-  const classData = {
-    name: form.name.trim(),
-    gradeLevel: Number(form.gradeLevel) || 0,
-    averageGrade: Number(form.averageGrade) || 0,
-    teacherId: form.teacherId || "",
-    studentIds: [],
-    classID: Number(form.gradeLevel) || 0,
-  };
-
-  if (editingClassId) {
-    const existing = classes.find((c) => c.id === editingClassId);
-
-    let ids = existing?.studentIds || [];
-    if (typeof ids === "string") ids = ids ? [ids] : [];
-    if (!Array.isArray(ids)) ids = [];
-
-    classData.studentIds = ids;
-
-    await updateDoc(doc(db, "classes", editingClassId), classData);
-
-    if (existing?.teacherId && existing.teacherId !== form.teacherId) {
-      await updateDoc(doc(db, "teachers", existing.teacherId), {
-        classIds: arrayRemove(editingClassId),
-      });
+    if (!form.name.trim()) {
+      alert("Please enter a class name.");
+      return;
     }
 
-    if (form.teacherId) {
-      await updateDoc(doc(db, "teachers", form.teacherId), {
-        classIds: arrayUnion(editingClassId),
-      });
-    }
+    const classData = {
+      name: form.name.trim(),
+      gradeLevel: Number(form.gradeLevel) || 0,
+      averageGrade: Number(form.averageGrade) || 0,
+      teacherId: form.teacherId || "",
+      studentIds: [],
+      classID: Number(form.gradeLevel) || 0,
+    };
 
-    setEditingClassId(null);
-  } else {
-    const newClassRef = await addDoc(classesCollection, classData);
+    if (editingClassId) {
+      const existing = classes.find((c) => c.id === editingClassId);
+      let ids = existing?.studentIds || [];
+      if (typeof ids === "string") ids = ids ? [ids] : [];
+      if (!Array.isArray(ids)) ids = [];
+      classData.studentIds = ids;
 
-    if (form.teacherId) {
-      await updateDoc(doc(db, "teachers", form.teacherId), {
-        classIds: arrayUnion(newClassRef.id),
-      });
+      await updateClass(editingClassId, classData, form.teacherId, existing?.teacherId)
+      setEditingClassId(null);
+    } else {
+      await addClass(classData, form.teacherId)
     }
-  }
 
   setForm(emptyForm);
 }
 
   async function handleDelete(classId) {
-  if (!window.confirm("Delete this class?")) return;
-
-  const classToDelete = classes.find((classItem) => classItem.id === classId);
-
-  if (classToDelete?.teacherId) {
-    await updateDoc(doc(db, "teachers", classToDelete.teacherId), {
-      classIds: arrayRemove(classId),
-    });
+    if (!window.confirm("Delete this class?")) return;
+    const classToDelete = classes.find((classItem) => classItem.id === classId);
+    await deleteClass(classId, classToDelete)
+    if (editingClassId === classId) {
+        handleCancelEdit()
+    }
   }
-
-  let studentIds = classToDelete?.studentIds || [];
-  if (typeof studentIds === "string") studentIds = studentIds ? [studentIds] : [];
-  if (!Array.isArray(studentIds)) studentIds = [];
-
-  await Promise.all(
-    studentIds.map((studentId) =>
-      updateDoc(doc(db, "students", studentId), {
-        classIds: arrayRemove(classId),
-      })
-    )
-  );
-
-  await deleteDoc(doc(db, "classes", classId));
-
-  if (editingClassId === classId) {
-    handleCancelEdit();
-  }
-}
 
   return (
     <Box sx={{ p: 3, width: "100%" }}>

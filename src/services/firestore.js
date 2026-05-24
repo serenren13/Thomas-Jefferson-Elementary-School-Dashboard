@@ -7,6 +7,8 @@ import {
   doc,
   serverTimestamp,
   onSnapshot,
+  arrayRemove,
+  arrayUnion
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
@@ -207,4 +209,55 @@ export async function addTeacher(firstName, lastName, email, subject, classIds) 
     classIds,
     createdAt: serverTimestamp(),
   });
+}
+
+export async function deleteClass(classId, classToDelete) {
+
+  if (classToDelete?.teacherId) {
+    await updateDoc(doc(db, "teachers", classToDelete.teacherId), {
+      classIds: arrayRemove(classId),
+    });
+  }
+
+  let studentIds = classToDelete?.studentIds || [];
+  if (typeof studentIds === "string") studentIds = studentIds ? [studentIds] : [];
+  if (!Array.isArray(studentIds)) studentIds = [];
+
+  await Promise.all(
+    studentIds.map((studentId) =>
+      updateDoc(doc(db, "students", studentId), {
+        classIds: arrayRemove(classId),
+      })
+    )
+  )
+
+  await deleteDoc(doc(db, "classes", classId))
+}
+
+export async function updateClass(classId, classData, teacherId, existingTeacherId) {
+
+  await updateDoc(doc(db, "classes", classId), classData);
+
+  if (existingTeacherId && existingTeacherId !== teacherId) {
+    await updateDoc(doc(db, "teachers", existingTeacherId), {
+      classIds: arrayRemove(classId),
+    });
+  }
+
+  if (teacherId) {
+    await updateDoc(doc(db, "teachers", teacherId), {
+      classIds: arrayUnion(classId)
+    })
+  }
+
+}
+export async function addClass(classData, teacherId) {
+
+  const newClassRef = await addDoc(collection(db, "classes"), classData);
+
+  if (teacherId) {
+    await updateDoc(doc(db, "teachers", teacherId), {
+      classIds: arrayUnion(newClassRef.id),
+    });
+  }
 }
