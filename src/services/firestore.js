@@ -6,6 +6,7 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 
@@ -116,4 +117,40 @@ export function calculateClassAverage(rosterWithGrades) {
   );
 
   return Number((total / studentsWithGrades.length).toFixed(2));
+}
+
+export function subscribeToStudents(onDataChange) {
+  const unsubscribe = onSnapshot(collection(db, "students"), (snapshot) => {
+    const studentList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+    onDataChange(studentList)
+  })
+  return unsubscribe
+}
+
+export function subscribeToClasses(onDataChange) {
+  const unsubscribe = onSnapshot(collection(db, "classes"), (snapshot) => {
+    const classList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+    onDataChange(classList)
+  })
+  return unsubscribe
+}
+
+export async function deleteStudent(studentId) {
+  const studentRef = doc(db, "students", studentId);
+  
+  return await deleteDoc(studentRef);
+}
+
+export async function updateStudent(studentId, updatedStudent) {
+  const studentRef = doc(db, "students", studentId);
+
+  return await updateDoc(studentRef, {
+    ...updatedStudent,
+  });
 }

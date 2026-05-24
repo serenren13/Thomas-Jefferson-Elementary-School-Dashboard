@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore"
-import { db } from "../firebase/firebase"
+import { subscribeToStudents, subscribeToClasses, deleteStudent, updateStudent } from "../services/firestore"
 import AddStudentForm from "../components/AddStudentForm"
 import { Box, Button, Card, CardContent, TextField, Typography, Chip } from "@mui/material"
 
@@ -12,24 +11,12 @@ export default function Students() {
     const [editForm, setEditForm] = useState({})
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "students"), (snapshot) => {
-            const studentList = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setStudents(studentList)
-        })
+        const unsubscribe = subscribeToStudents(setStudents)
         return unsubscribe
     }, [])
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "classes"), (snapshot) => {
-            const classList = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setClasses(classList)
-        })
+        const unsubscribe = subscribeToClasses(setClasses)
         return unsubscribe
     }, [])
 
@@ -38,7 +25,7 @@ export default function Students() {
         : students.filter((student) => student.classIds?.includes(selectedClass))
 
     const removeStudent = async (studentId) => {
-        await deleteDoc(doc(db, "students", studentId))
+        await deleteStudent(studentId)
     }
 
     const handleEdit = (student) => {
@@ -52,7 +39,7 @@ export default function Students() {
     }
 
     const handleSave = async (studentId) => {
-        await updateDoc(doc(db, "students", studentId), editForm)
+        await updateStudent(studentId, editForm)
         setEditingId(null)
     }
 
