@@ -1,18 +1,44 @@
 import { useState, useEffect } from "react"
-import { subscribeToTeachers, deleteTeacher, updateTeacher } from "../services/firestore"
-import AddTeacherForm from "../components/AddTeacherForm"
-import { Box, Button, Card, CardContent, TextField, Typography, Chip } from "@mui/material"
+import { addTeacher, subscribeToTeachers, subscribeToClasses, deleteTeacher, updateTeacher } from "../services/firestore"
+import { Box, Button, Card, CardContent, MenuItem, TextField, Typography, Chip } from "@mui/material"
 
 export default function Teachers() {
     const [teachers, setTeachers] = useState([])
     const [selectedSubject, setSelectedSubject] = useState("all")
     const [editingId, setEditingId] = useState(null)
     const [editForm, setEditForm] = useState({})
+    const [firstName, setFirstName] = useState("")
+    const [lastName, setLastName] = useState("")
+    const [email, setEmail] = useState("")
+    const [subject, setSubject] = useState("")
+    const [classIds, setClassIds] = useState([])
+    const [classes, setClasses] = useState([])
 
     useEffect(() => {
         const unsubscribe = subscribeToTeachers(setTeachers)
         return unsubscribe
     }, [])
+
+    useEffect(() => {
+        const unsubscribe = subscribeToClasses(setClasses)
+        return unsubscribe
+    }, [])
+
+    const handleSubmit = async (e) => {
+                e.preventDefault()
+                await addTeacher(
+                    firstName,
+                    lastName,
+                    email,
+                    subject,
+                    classIds,
+                )
+                setFirstName("")
+                setLastName("")
+                setEmail("")
+                setSubject("")
+                setClassIds([])
+            }
 
     const subjects = ["all", ...new Set(teachers.map(t => t.subject).filter(Boolean))]
 
@@ -98,7 +124,55 @@ export default function Teachers() {
                 ))}
             </Box>
 
-            <AddTeacherForm />
+            <Box sx={{ mt: 4, p: 3, border: "1px solid #e0e0e0", borderRadius: 2 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Add New Teacher
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField 
+                        label="First Name" 
+                        value={firstName} 
+                        onChange={(e) => setFirstName(e.target.value)} 
+                        fullWidth />
+                    <TextField 
+                        label="Last Name" 
+                        value={lastName} 
+                        onChange={(e) => setLastName(e.target.value)} 
+                        fullWidth />
+                </Box>
+                <TextField 
+                    label="Email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    fullWidth />
+                <TextField 
+                    label="Subject" 
+                    value={subject} 
+                    onChange={(e) => setSubject(e.target.value)} 
+                    fullWidth />
+                <TextField 
+                    select
+                    SelectProps={{ multiple: true }}
+                    label="Classes" 
+                    name="classIds" 
+                    value={classIds}
+                    onChange={(e) => setClassIds(e.target.value)} 
+                    fullWidth
+                >
+                    {classes.map((cls) => (
+                        <MenuItem 
+                            key={cls.id}
+                            value={cls.id}>
+                                {cls.name}
+                            </MenuItem>
+                    ))}
+                </TextField>
+                <Button type="submit" variant="contained" sx={{ alignSelf: "flex-start" }}>
+                    Add Teacher
+                </Button>
+            </Box>
+        </Box>
         </Box>
     )
 }
