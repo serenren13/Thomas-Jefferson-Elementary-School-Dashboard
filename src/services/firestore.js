@@ -179,3 +179,32 @@ export async function updateTeacher(teacherId, updatedTeacher) {
     ...updatedTeacher,
   });
 }
+
+export async function addStudent(firstName, lastName, birthday, gradeLevel, classIds, parentEmailContact) {
+  
+  const studentRef = collection(db, "students");
+
+  return await addDoc(studentRef, {
+    firstName,
+    lastName,
+    birthday,
+    gradeLevel,
+    classIds,
+    parentEmailContact,
+    createdSt: serverTimestamp(),
+  });
+}
+
+export async function addTeacher(firstName, lastName, email, subject, classIds) {
+  
+  const teacherRef = collection(db, "teachers");
+
+  return await addDoc(teacherRef, {
+    firstName,
+    lastName,
+    email,
+    subject,
+    classIds,
+    createdAt: serverTimestamp(),
+  });
+}

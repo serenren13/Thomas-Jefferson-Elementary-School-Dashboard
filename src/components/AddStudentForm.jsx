@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { addDoc, collection } from "firebase/firestore"
-import { db } from "../firebase/firebase"
+import { addStudent } from "../services/firestore"
 import { Box, Button, TextField, Typography } from "@mui/material"
 
 export default function AddStudentForm() {
@@ -13,14 +12,14 @@ export default function AddStudentForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await addDoc(collection(db, "students"), {
+        await addStudent(
             firstName,
             lastName,
             birthday,
             gradeLevel,
-            classIds: classIds.split(",").map(id => id.trim()),
+            classIds.split(",").map(id => id.trim()),
             parentEmailContact
-        })
+        )
         setFirstName("")
         setLastName("")
         setBirthday("")
