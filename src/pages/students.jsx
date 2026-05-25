@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore"
-import { db } from "../firebase/firebase"
-import AddStudentForm from "../components/AddStudentForm"
-import { Box, Button, Card, CardContent, TextField, Typography, Chip } from "@mui/material"
+import { addStudent, subscribeToStudents, subscribeToClasses, deleteStudent, updateStudent } from "../services/firestore"
+import { Box, Button, Card, CardContent, Chip, MenuItem, TextField, Typography } from "@mui/material"
 
 export default function Students() {
+    const [firstName, setFirstName] = useState("")
+    const [lastName, setLastName] = useState("")
+    const [birthday, setBirthday] = useState("")
+    const [gradeLevel, setGradeLevel] = useState("")
+    const [classIds, setClassIds] = useState([])
+    const [parentEmailContact, setParentEmailContact] = useState("")
     const [students, setStudents] = useState([])
     const [classes, setClasses] = useState([])
     const [selectedClass, setSelectedClass] = useState("all")
@@ -12,33 +16,39 @@ export default function Students() {
     const [editForm, setEditForm] = useState({})
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "students"), (snapshot) => {
-            const studentList = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setStudents(studentList)
-        })
+        const unsubscribe = subscribeToStudents(setStudents)
         return unsubscribe
     }, [])
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "classes"), (snapshot) => {
-            const classList = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setClasses(classList)
-        })
+        const unsubscribe = subscribeToClasses(setClasses)
         return unsubscribe
     }, [])
+
+    const handleSubmit = async (e) => {
+            e.preventDefault()
+            await addStudent(
+                firstName,
+                lastName,
+                birthday,
+                gradeLevel,
+                classIds,
+                parentEmailContact
+            )
+            setFirstName("")
+            setLastName("")
+            setBirthday("")
+            setGradeLevel("")
+            setClassIds([])
+            setParentEmailContact("")
+        }
 
     const filteredStudents = selectedClass === "all"
         ? students
         : students.filter((student) => student.classIds?.includes(selectedClass))
 
     const removeStudent = async (studentId) => {
-        await deleteDoc(doc(db, "students", studentId))
+        await deleteStudent(studentId)
     }
 
     const handleEdit = (student) => {
@@ -52,7 +62,7 @@ export default function Students() {
     }
 
     const handleSave = async (studentId) => {
-        await updateDoc(doc(db, "students", studentId), editForm)
+        await updateStudent(studentId, editForm)
         setEditingId(null)
     }
 
@@ -90,10 +100,26 @@ export default function Students() {
                         <CardContent>
                             {editingId === student.id ? (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                                    <TextField label="First Name" value={editForm.firstName ?? ""} onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })} fullWidth />
-                                    <TextField label="Last Name" value={editForm.lastName ?? ""} onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })} fullWidth />
-                                    <TextField label="Grade Level" value={editForm.gradeLevel ?? ""} onChange={(e) => setEditForm({ ...editForm, gradeLevel: e.target.value })} fullWidth />
-                                    <TextField label="Parent Email" value={editForm.parentEmailContact ?? ""} onChange={(e) => setEditForm({ ...editForm, parentEmailContact: e.target.value })} fullWidth />
+                                    <TextField 
+                                        label="First Name" 
+                                        value={editForm.firstName ?? ""} 
+                                        onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })} 
+                                        fullWidth />
+                                    <TextField 
+                                        label="Last Name" 
+                                        value={editForm.lastName ?? ""} 
+                                        onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })} 
+                                        fullWidth />
+                                    <TextField 
+                                        label="Grade Level" 
+                                        value={editForm.gradeLevel ?? ""} 
+                                        onChange={(e) => setEditForm({ ...editForm, gradeLevel: e.target.value })} 
+                                        fullWidth />
+                                    <TextField 
+                                        label="Parent Email" 
+                                        value={editForm.parentEmailContact ?? ""} 
+                                        onChange={(e) => setEditForm({ ...editForm, parentEmailContact: e.target.value })} 
+                                        fullWidth />
                                     <Box sx={{ display: "flex", gap: 1 }}>
                                         <Button variant="contained" onClick={() => handleSave(student.id)}>Save</Button>
                                         <Button variant="outlined" onClick={() => setEditingId(null)}>Cancel</Button>
@@ -121,7 +147,61 @@ export default function Students() {
                 ))}
             </Box>
 
-            <AddStudentForm />
+            <Box sx={{ mt: 4, p: 3, border: "1px solid #e0e0e0", borderRadius: 2 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Add New Student
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField 
+                        label="First Name" 
+                        value={firstName} 
+                        onChange={(e) => setFirstName(e.target.value)} 
+                        fullWidth />
+                    <TextField 
+                        label="Last Name" 
+                        value={lastName} 
+                        onChange={(e) => setLastName(e.target.value)} 
+                        fullWidth />
+                </Box>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField 
+                        label="Birthday" 
+                        type="date" value={birthday} 
+                        onChange={(e) => setBirthday(e.target.value)} 
+                        fullWidth InputLabelProps={{ shrink: true }} />
+                    <TextField 
+                        label="Grade Level" 
+                        type="number" 
+                        value={gradeLevel} 
+                        onChange={(e) => setGradeLevel(e.target.value)} 
+                        fullWidth />
+                </Box>
+                <TextField 
+                    select
+                    SelectProps={{ multiple: true }}
+                    label="Classes" 
+                    name="classIds"
+                    value={classIds}
+                    onChange={(e) => setClassIds(e.target.value)} 
+                    fullWidth 
+                >
+                    {classes.map((cls) => (
+                        <MenuItem key={cls.id} value={cls.id}>
+                            {cls.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                <TextField 
+                    label="Parent Email" 
+                    value={parentEmailContact} 
+                    onChange={(e) => setParentEmailContact(e.target.value)} 
+                    fullWidth />
+                <Button type="submit" variant="contained" sx={{ alignSelf: "flex-start" }}>
+                    Add Student
+                </Button>
+            </Box>
+        </Box>
         </Box>
     )
 }
